@@ -1,13 +1,22 @@
 import { Module } from '@nestjs/common';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
+import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { ConfigModule } from './config/config.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { APP_GUARD } from '@nestjs/core';
+import { RoleModule } from './roles/role.module';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
+    ConfigModule,
+    PrismaModule,
+    AuthModule,
+    UserModule,
+    RoleModule,
+    PermissionModule,
     ThrottlerModule.forRootAsync({
       useFactory: () => ({
         throttlers: [
@@ -18,16 +27,12 @@ import { APP_GUARD } from '@nestjs/core';
         ],
       }),
     }),
-    ConfigModule,
-    PrismaModule,
-    AuthModule,
-    UserModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
-    }
-  ]
+    },
+  ],
 })
 export class AppModule {}
